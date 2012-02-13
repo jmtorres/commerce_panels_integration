@@ -1,0 +1,6 @@
+name = Commerce Panels Integration
+description = This module will provide a panel plugin for commerce ogone. When you enable this module the commerce checkout pages will be overridden with panel pages. 
+core = 7.x
+version = "7.x-1.0"
+project = "commerce_panels_integration"
+
