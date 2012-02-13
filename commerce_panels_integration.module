@@ -1,10 +1,27 @@
 <?php
 
 /**
+ * @file
+ * Commerce panels integration primary module file.
+ *
+ * This file contains nothing more than a ctools hook to allow
+ * ctools to find the plugins directory.
+ */
+
+/**
+ * Implementation of hook_ctools_plugin_directory() to let the system know
+ * where all our own plugins are.
  *
  * @param type $owner
+ * The system name of the module owning the plugin type for which a base
+ * directory location is being requested.
+ *
  * @param type $plugin_type
- * @return type
+ * The name of the plugin type for which a base directory is being requested.
+ *
+ * @return path
+ * The path where CTools' plugin system should search for plugin files, 
+ * relative to your module's root. Omit leading and trailing slashes.
  */
 function commerce_panels_integration_ctools_plugin_directory($owner, $plugin_type) {
   if ($owner == 'page_manager') {
