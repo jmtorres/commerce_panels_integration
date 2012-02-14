@@ -6,9 +6,9 @@
  */
 
  /**
- * Plugins are described by creating a $plugin array which will be used
- * by the system that includes this file.
- */
+  * Plugins are described by creating a $plugin array which will be used
+  * by the system that includes this file.
+  */
 
 $plugin = array(
   'single' => TRUE,
@@ -18,9 +18,9 @@ $plugin = array(
 );
 
 /**
-* Load the commerce checkout pages to be able to call the function
-* commerce_cehckout_router()
-*/
+ * Load the commerce checkout pages to be able to call the function
+ * commerce_cehckout_router()
+ */
 
 module_load_include('inc', 'commerce_checkout', 'includes/commerce_checkout.pages');
 
@@ -43,6 +43,6 @@ function commerce_panels_integration_commerce_checkout_form_content_type_render(
  * A blank form so we have a place to have context settings
  */
 function commerce_panels_integration_commerce_checkout_form_content_type_edit_form($form, &$form_state) {
-  // provide a blank form so we have a place to have context setting.
+  // Provide a blank form so we have a place to have context setting.
   return $form;
 }

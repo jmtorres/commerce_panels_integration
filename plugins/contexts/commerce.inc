@@ -3,18 +3,19 @@
 /**
  * @file
  *
- * Plugin to provide a vocabulary context
+ * Plugin to provide a commerce context
  */
+
 /**
  * Plugins are described by creating a $plugin array which will be used
  * by the system that includes this file.
  */
 $plugin = array(
-    'title' => t("Commerce Checkout Context"),
-    'description' => t('Context required for the commerce checkout page'),
-    'context' => 'commerce_panels_integration_create_commerce',
-    'keyword' => 'commerce_order',
-    'context name' => 'commerce',
+  'title' => t("Commerce Checkout Context"),
+  'description' => t('Context required for the commerce checkout page'),
+  'context' => 'commerce_panels_integration_create_commerce',
+  'keyword' => 'commerce_order',
+  'context name' => 'commerce',
 );
 
 /**
@@ -36,4 +37,3 @@ function commerce_panels_integration_create_commerce($empty, $data = NULL, $conf
     return $context;
   }
 }
-
