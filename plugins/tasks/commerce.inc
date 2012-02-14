@@ -2,43 +2,50 @@
 
 /**
  * @file
+ * Handle the 'commerce' override task.
  *
- * Specialized implementation of hook_commerce_panels_integration_task_tasks(). See api-task.html for
+ * This plugin overrides commerce/% and reroutes it to the page manager, where
+ * a list of tasks can be used to service this request based upon criteria
+ * supplied by access plugins.
+ */
+
+/**
+ * Specialized implementation of hook_page_manager_task_tasks(). 
+ * See api-task.html for
  * more information.
- * We implement the page manager tasks for menu altering
  */
 function commerce_panels_integration_commerce_page_manager_tasks() {
   return array(
-      // This is a 'page' task and will fall under the page admin UI
-      'task type' => 'page',
-      'title' => t('Commerce Checkout Template'),
-      'admin title' => t('Commerce Checkout Template'),
-      'admin description' => t('When enabled, this overrides the default Drupal behavior for displaying commerce checkout form.'),
-      'admin path' => 'checkout/%commerce_order',
-      // Callback to add items to the page managertask administration form:
-      'hook menu' => 'commerce_panels_integration_commerce_menu',
-      'hook menu alter' => 'commerce_panels_integration_commerce_menu_alter',
-      // This is task uses 'context' handlers and must implement these to give the
-      // handler data it needs.
-      'handler type' => 'context', // handler type -- misnamed
-      'get arguments' => 'commerce_panels_integration_commerce_get_arguments',
-      'get context placeholders' => 'commerce_panels_integration_commerce_get_contexts',
-      // Allow this to be enabled or disabled:
-      'disabled' => variable_get('commerce_panels_integration_commerce_disabled', TRUE),
-      'enable callback' => 'commerce_panels_integration_commerce_enable',
-      'access callback' => 'commerce_panels_integration_commerce_access_check',
+    // This is a 'page' task and will fall under the page admin UI
+    'task type' => 'page',
+    'title' => t('Commerce Checkout Template'),
+    'admin title' => t('Commerce Checkout Template'),
+    'admin description' => t('When enabled, this overrides the default Drupal
+    behavior for displaying commerce checkout form.'),
+    'admin path' => 'checkout/%commerce_order',
+    // Callback to add items to the page manager task administration form:
+    'hook menu' => 'commerce_panels_integration_commerce_menu',
+    'hook menu alter' => 'commerce_panels_integration_commerce_menu_alter',
+    /** This is a task that uses 'context' handlers and must implement these
+     * to give the
+     * handler data it needs.
+     */ 
+    'handler type' => 'context', // handler type
+    'get arguments' => 'commerce_panels_integration_commerce_get_arguments',
+    'get context placeholders' => 'commerce_panels_integration_commerce_get_contexts',
+    // Allow this to be enabled or disabled:
+    'disabled' => variable_get('commerce_panels_integration_commerce_disabled', TRUE),
+    'enable callback' => 'commerce_panels_integration_commerce_enable',
+    'access callback' => 'commerce_panels_integration_commerce_access_check',
   );
 }
 
 /**
+ * Callback defined by 
+ * commerce_panels_integration_commerce_page_manager_tasks().
  *
- * @param type $items
- * @param type $task
- * @return type 
- * In this function we override the menu for commerce
- * The second if function is used to override the menu when we access the checkout page like /review
- * The third if function is used to override the menu when we access the first checkout page
- * we set the page callback to commerce_panels_integration commerce page for overriding the page callback
+ * Alter the commerce form so that view comes to us rather than the
+ * normal process.
  */
 function commerce_panels_integration_commerce_menu_alter(&$items, $task) {
   if (variable_get('commerce_panels_integration_commerce_disabled', TRUE)) {
