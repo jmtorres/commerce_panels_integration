@@ -10,13 +10,13 @@
  */
 
 /**
- * Specialized implementation of hook_page_manager_task_tasks(). 
+ * Specialized implementation of hook_page_manager_task_tasks().
  * See api-task.html for
  * more information.
  */
 function commerce_panels_integration_commerce_page_manager_tasks() {
   return array(
-    // This is a 'page' task and will fall under the page admin UI
+    // This is a 'page' task and will fall under the page admin UI.
     'task type' => 'page',
     'title' => t('Commerce Checkout Template'),
     'admin title' => t('Commerce Checkout Template'),
@@ -29,11 +29,11 @@ function commerce_panels_integration_commerce_page_manager_tasks() {
     /** This is a task that uses 'context' handlers and must implement these
      * to give the
      * handler data it needs.
-     */ 
-    'handler type' => 'context', // handler type
+     */
+    'handler type' => 'context',
     'get arguments' => 'commerce_panels_integration_commerce_get_arguments',
     'get context placeholders' => 'commerce_panels_integration_commerce_get_contexts',
-    // Allow this to be enabled or disabled:
+    // Allow this to be enabled or disabled.
     'disabled' => variable_get('commerce_panels_integration_commerce_disabled', TRUE),
     'enable callback' => 'commerce_panels_integration_commerce_enable',
     'access callback' => 'commerce_panels_integration_commerce_access_check',
@@ -41,7 +41,7 @@ function commerce_panels_integration_commerce_page_manager_tasks() {
 }
 
 /**
- * Callback defined by 
+ * Callback defined by
  * commerce_panels_integration_commerce_page_manager_tasks().
  *
  * Alter the commerce form so that view comes to us rather than the
@@ -51,7 +51,6 @@ function commerce_panels_integration_commerce_menu_alter(&$items, $task) {
   if (variable_get('commerce_panels_integration_commerce_disabled', TRUE)) {
     return;
   }
-  
   if ($items['checkout/%commerce_order/%commerce_checkout_page']['page callback'] == 'drupal_get_form' || variable_get('page_manager_override_anyway', FALSE)) {
     $items['checkout/%commerce_order/%commerce_checkout_page']['page callback'] = 'commerce_panels_integration_commerce_page';
     $items['checkout/%commerce_order/%commerce_checkout_page']['page arguments'] = array(1, 2);
@@ -65,7 +64,7 @@ function commerce_panels_integration_commerce_menu_alter(&$items, $task) {
     $items['checkout/%commerce_order']['file'] = $task['file'];
   }
   else {
-    // automatically disable this task if it cannot be enabled.
+    // Automatically disable this task if it cannot be enabled.
     variable_set('commerce_panels_integration_commerce_disabled', TRUE);
     if (!empty($GLOBALS['commerce_panels_integration_enabling_commerce'])) {
       drupal_set_message(t('Page manager module is unable to enable checkout/%commerce_order because some other module already has overridden with %callback.', array('%callback' => $items['checkout/%commerce_order']['page callback'])), 'error');
@@ -74,7 +73,8 @@ function commerce_panels_integration_commerce_menu_alter(&$items, $task) {
 }
 
 /**
- * In this function we are going to call the page arguments and put it in context so we can access it all the time.
+ * In this function we are going to call the page arguments and put it in 
+ * context so we can access it all the time.
  * We build our form with the page args that are send with the page callback
  */
 function commerce_panels_integration_commerce_page($order, $checkout_page = NULL) {
@@ -106,9 +106,11 @@ function commerce_panels_integration_commerce_page($order, $checkout_page = NULL
   // Otherwise, fall back.
   if ($function == 'drupal_get_form') {
 
-    //In order to ajax fields to work we need to run form_load_include.
-    //Hence we eschew drupal_get_form and manually build the info and
-    //call drupal_build_form.
+    /**
+     * In order to ajax fields to work we need to run form_load_include.
+     * Hence we eschew drupal_get_form and manually build the info and
+     * call drupal_build_form.
+     */
     $form_state = array();
     $form_id = 'commerce_form_' . $checkout_page['page_id'];
     $args = array($order, $checkout_page);
@@ -123,16 +125,16 @@ function commerce_panels_integration_commerce_page($order, $checkout_page = NULL
 
 /**
  * Callback to get arguments provided by this task handler.
- * 
+ *
  */
 function commerce_panels_integration_commerce_get_arguments($task, $subtask_id) {
   return array(
-      array(
-          'keyword' => 'commerce_order',
-          'identifier' => t('Checkout page beging viewed'),
-          'id' => 1,
-          'name' => 'commerce',
-          'settings' => array(),
+    array(
+        'keyword' => 'commerce_order',
+        'identifier' => t('Checkout page beging viewed'),
+        'id' => 1,
+        'name' => 'commerce',
+        'settings' => array(),
       ),
   );
 }
@@ -157,10 +159,12 @@ function commerce_panels_integration_commerce_enable($cache, $status) {
 }
 
 /**
- *
  * @param type $task
+ *
  * @param type $subtask_id
+ *
  * @param type $contexts
+ *
  * @return type 
  * Acess check for commerce page
  */
