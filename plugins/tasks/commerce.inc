@@ -148,7 +148,6 @@ function commerce_panels_integration_commerce_enable($cache, $status) {
   variable_set('commerce_panels_integration_commerce_disabled', $status);
    // Set a global flag so that the menu routine knows it needs
    // to set a message if enabling cannot be done.
-   */ 
   if (!$status) {
     $GLOBALS['commerce_panels_integration_enabling_commerce'] = TRUE;
   }
