@@ -36,7 +36,6 @@ function commerce_panels_integration_commerce_page_manager_tasks() {
     // Allow this to be enabled or disabled.
     'disabled' => variable_get('commerce_panels_integration_commerce_disabled', TRUE),
     'enable callback' => 'commerce_panels_integration_commerce_enable',
-    'access callback' => 'commerce_panels_integration_commerce_access_check',
   );
 }
 
@@ -151,25 +150,11 @@ function commerce_panels_integration_commerce_get_contexts($task, $subtask_id) {
  */
 function commerce_panels_integration_commerce_enable($cache, $status) {
   variable_set('commerce_panels_integration_commerce_disabled', $status);
-  // Set a global flag so that the menu routine knows it needs
-  // to set a message if enabling cannot be done.
+  /**
+   * Set a global flag so that the menu routine knows it needs
+   * to set a message if enabling cannot be done.
+   */ 
   if (!$status) {
     $GLOBALS['commerce_panels_integration_enabling_commerce'] = TRUE;
   }
 }
-
-/**
- * @param type $task
- *
- * @param type $subtask_id
- *
- * @param type $contexts
- *
- * @return type 
- * Acess check for commerce page
- */
-function commerce_panels_integration_commerce_access_check($task, $subtask_id, $contexts) {
-  $context = reset($contexts);
-  return commerce_access($context->data);
-}
-
