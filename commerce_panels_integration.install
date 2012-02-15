@@ -10,8 +10,8 @@
  * Implements hook_install().
  */
 function commerce_panels_integration_install() {
-  // Enable pagemanager to override pages
+  // Enable pagemanager to override pages.
   variable_set('page_manager_override_anyway', TRUE);
-  // Set the commerce panel page enabled by default
+  // Set the commerce panel page enabled by default.
   variable_set('commerce_panels_integration_commerce_disabled', FALSE);
 }
