@@ -8,22 +8,23 @@ $plugin = array(
   'path placeholder' => '%pm_arg',
 );
 
-dpm(get_defined_vars());
-
 function commerce_panels_integration_argument_commerce_checkout_page_context($arg = NULL, $conf = NULL, $empty = FALSE) {
-dpm(get_defined_vars());
-  if($empty) {
+  if ($empty) {
     return ctools_context_create_empty('commerce_checkout_page');
   }
 
-  if (is_object($arg)) {
+  if (empty($arg)) {
+    $arg = commerce_checkout_first_checkout_page();
+  }
+
+  if (is_array($arg)) {
     return ctools_context_create('commerce_checkout_page', $arg);
   }
 
   $checkout_page = commerce_checkout_page_load($arg);
 
   if(!$checkout_page) {
-    return FALSE;
+    return ctools_context_create_empty('commerce_checkout_page');
   }
 
   return ctools_context_create('commerce_checkout_page', $checkout_page);

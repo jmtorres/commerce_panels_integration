@@ -6,7 +6,7 @@ $plugin = array(
   'description' => t('A Pane from the Commerce Checkout workflow.'),
   'required context' => array(
     new ctools_context_required(t('Commerce Order'), 'commerce_order'),
-//    new ctools_context_required(t('Commerce Checkout Page'), 'commerce_checkout_page'),
+    new ctools_context_required(t('Commerce Checkout Page'), 'commerce_checkout_page'),
   ),
   'defaults' => array('pane' => ''),
   'category' => t('Commerce'),
@@ -19,64 +19,21 @@ $plugin = array(
 
 
 function commerce_panels_integration_commerce_checkout_pane_content_type_render($subtype, $conf, $panel_args, $context){
+  $block = new stdClass();
   $pane_id = $conf['pane'];
-  $checkout_pane = commerce_checkout_pane_load($pane_id);
+  $block->delta = $pane_id;
 
-  if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form')) {
-    // Generate the pane form.
-    $pane_form = $callback($form, $form_state, $checkout_pane, $context[0]->data);
-
-    // Combine the messages that were created during this pane's validation or
-    // submit process with any that were created during the pane generation
-    // and merge them into the session's current messages array.
-    if (!empty($form_state['storage']['messages'][$pane_id])) {
-      $_SESSION['messages'] = array_merge_recursive($form_state['storage']['messages'][$pane_id], drupal_get_messages());
-    }
-
-    // If there are messages in the session right now for this pane, theme
-    // them into the form right above the pane itself.
-    if (!empty($_SESSION['messages'])) {
-      // If there are error messages and this is not the first pane on the
-      // form, then indicate we need to show an error message at the top of
-      // the page.
-      if ($visible_panes > 0 && !empty($_SESSION['messages']['error'])) {
-        $show_errors_message = TRUE;
-      }
-
-      // Rendering status messages clears the session of messages, so they
-      // will not be visible if the user is redirected. We can at least not
-      // render here when we detect the global variable added by Rules to
-      // handle redirects, though modules implementing redirects will still
-      // encounter the same problem of "lost" messages.
-      if (!isset($GLOBALS['_rules_action_drupal_goto_do'])) {
-        $form_state['storage']['themed_messages'][$pane_id] = theme('status_messages');
-
-        $pane_form[$pane_id . '_messages'] = array(
-          '#markup' => $form_state['storage']['themed_messages'][$pane_id], 
-          '#weight' => -50,
-        );
-      }
-    }
-
-    // Create a fieldset for the pane and add the form data defined in the
-    // pane's form callback.
-    if ($pane_form) {
-      $form[$pane_id] = $pane_form + array(
-        '#type' => $checkout_pane['fieldset'] ? 'fieldset' : 'container', 
-        '#title' => check_plain($checkout_pane['title']), 
-        '#collapsible' => $checkout_pane['collapsible'], 
-        '#collapsed' => $checkout_pane['collapsed'], 
-        '#attributes' => array('class' => array($pane_id)), 
-        '#tree' => TRUE,
-      );
+  if (isset($context[1]->form)) {
+    if (!empty($context[1]->form[$pane_id])) {
+      $block->content[$pane_id] = $context[1]->form[$pane_id];
+      $block->title = $context[1]->form[$pane_id]['#title'];
+      unset($context[1]->form[$pane_id]);
     }
   }
-
-  $pane = new stdClass();
-
-  $pane->content = $pane_form;
-
-  return $pane;
+  else {
+    $block->content = t($pane_id . ' form');
+  }
+  return $block;
 }
 
 function commerce_panels_integration_commerce_checkout_pane_content_type_edit_form($form, &$form_state){

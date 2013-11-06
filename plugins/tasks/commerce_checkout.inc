@@ -83,12 +83,67 @@ function commerce_panels_integration_commerce_checkout_page($order, $checkout_pa
   ctools_include('context-task-handler');
   $contexts = ctools_context_handler_get_task_contexts($task, '', array($order, $checkout_page));
 
+  $checkout_page_context = &$contexts['argument_commerce_checkout_page_2'];
+
+  $checkout_page = $checkout_page_context->data;
+
+  // If the user does not have access to checkout the order, return a 404. We
+  // could return a 403, but then the user would know they've identified a
+  // potentially valid checkout URL.
+  if (!commerce_checkout_access($order)) {
+    return MENU_NOT_FOUND;
+  }
+
+  // If the user is attempting to access an inaccessible page for their order,
+  // redirect them to the proper page.
+  if (!commerce_checkout_page_access($checkout_page, $order)) {
+    $target_uri = commerce_checkout_order_uri($order);
+
+    // Only redirect if the target page is different from the page the user was
+    // trying to access. Otherwise give a 403 error.
+    if (!empty($target_uri) && $target_uri !== $_GET['q']) {
+      drupal_goto($target_uri);
+    }
+    else {
+      return MENU_ACCESS_DENIED;
+    }
+  }
+
+  // If there are no line items on the order, redirect away.
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+  if (commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types()) == 0) {
+    drupal_goto('<front>');
+  }
+
+  // Prior to displaying the checkout form, allow other modules to route the
+  // checkout form.
+  module_invoke_all('commerce_checkout_router', $order, $checkout_page);
+
+  // Update the page title if specified.
+  if (!empty($checkout_page['title'])) {
+    drupal_set_title($checkout_page['title']);
+  }
+
+  $form_id = 'commerce_checkout_form_' . $checkout_page['page_id'];
+
+  $form_state = array();
+
+  $form_state['build_info']['args'] = array($order, $checkout_page);
+  
+  form_load_include($form_state, 'inc', 'commerce_checkout', 'includes/commerce_checkout.pages');
+
+  $form = drupal_build_form($form_id, $form_state);
+
+  $checkout_page_context->form = $form;
+  $checkout_page_context->form_state = &$form_state;
+  $checkout_page_context->form_id = $form_id;
+
   $output = ctools_context_handler_render($task, '', $contexts, array($order, $checkout_page));
 
   if ($output != FALSE) {
     return $output;
   }
-
 
   $function = 'drupal_get_form';
   foreach (module_implements('page_manager_override') as $module) {
@@ -105,7 +160,7 @@ function commerce_panels_integration_commerce_checkout_page($order, $checkout_pa
      // Hence we eschew drupal_get_form and manually build the info and
      // call drupal_build_form.
     $form_state = array();
-    $form_id = 'commerce_form_' . $checkout_page['page_id'];
+    $form_id = 'commerce_checkout_form_' . $checkout_page['page_id'];
     $args = array($order, $checkout_page);
     $form_state['build_info']['args'] = $args;
     form_load_include($form_state, 'inc', 'checkout', 'commerce_pages');
@@ -113,7 +168,7 @@ function commerce_panels_integration_commerce_checkout_page($order, $checkout_pa
     return $output;
   }
 
-  return $function($order, $checkout_page = NULL);
+  return $function($order, $checkout_page);
 }
 
 /**
@@ -124,14 +179,14 @@ function commerce_panels_integration_commerce_checkout_get_arguments($task, $sub
   return array(
     array(
       'keyword' => 'commerce_order',
-      'identifier' => t('Commerce order being checked out.'),
+      'identifier' => t('Commerce order being checked out'),
       'id' => 1,
       'name' => 'entity_id:commerce_order',
       'settings' => array(),
     ),
     array(
       'keyword' => 'commerce_checkout_page',
-      'identifier' => t('Commerce checkout page being shown.'),
+      'identifier' => t('Commerce checkout page being shown'),
       'id' => 2,
       'name' => 'commerce_checkout_page',
       'settings' => array(),

@@ -23,7 +23,6 @@
  *   relative to your module's root. Omit leading and trailing slashes.
  */
 function commerce_panels_integration_ctools_plugin_directory($owner, $plugin_type) {
-dpm(get_defined_vars());
   if ($owner == 'page_manager') {
     return 'plugins/' . $plugin_type;
   }
@@ -32,6 +31,14 @@ dpm(get_defined_vars());
   }
 }
 
-function commerce_panels_integration_ctools_plugin_pre_alter(&$plugin, &$info) {
-//  dpm(get_defined_vars());
+function commerce_panels_integration_form_commerce_checkout_form_alter(&$form, &$form_state, $form_id) {
+  if (variable_get('commerce_panels_integration_commerce_checkout_disabled', TRUE)) {
+    return;
+  }
+
+  foreach (element_children($form) as $element_id) {
+    if($form[$element_id]['#type'] == 'fieldset') {
+      $form[$element_id]['#type'] = 'container';
+    }
+  }
 }
